@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.util.Log;
 import android.widget.TextView;
 import android.hardware.SensorEventListener;
+import java.util.List;
 //import android.app.Activity;
 //import android.content.Context;
 //import android.os.Bundle;
@@ -16,7 +18,7 @@ import android.hardware.SensorEventListener;
 public class MainActivity extends AppCompatActivity {
     SensorManager sensorManager;
     TextView textView;
-    Sensor accelerometer;
+//    Sensor accelerometer;
     private SensorEventListener sensorEventListener = new SensorEventListener() {
 
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -25,6 +27,10 @@ public class MainActivity extends AppCompatActivity {
 
         public void onSensorChanged(SensorEvent event) {
             Sensor sensor = event.sensor;
+//            System.out.println("SENSOR TYPE IS: " + sensor.getType() + " " + Sensor.TYPE_ACCELEROMETER + " " + Sensor.TYPE_GYROSCOPE + " " + Sensor.TYPE_MAGNETIC_FIELD);
+//            String sensorName = sensor.getName();
+//            System.out.println(sensorName + ": X: " + event.values[0] + "; Y: " + event.values[1] + "; Z: " + event.values[2] + ";");
+
             if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 float x = event.values[0];
                 float y = event.values[1];
@@ -44,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 update(x, y, z, sensor.getType());
             }
             else{
-                textView.setText("No sensor inputs detected.");
+                textView.setText("No sensor inputs detected...");
             }
         }
     };
@@ -58,20 +64,20 @@ public class MainActivity extends AppCompatActivity {
         textView = new TextView(this);
         setContentView(textView);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+//        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 //        gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 //        magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
     }
 
     public void update(float x, float y, float z, int sensor) {
         if(sensor == Sensor.TYPE_ACCELEROMETER) {
-            textView.setText("x_acc: " + x + "\ny_acc: " + y + "\nz_acc: " + z);
+            textView.setText("Sensor Type: " + sensor + "\nx_acc: " + x + "\ny_acc: " + y + "\nz_acc: " + z);
         }
         else if(sensor == Sensor.TYPE_GYROSCOPE) {
-            textView.setText("x_gyr: " + x + "\ny_gyr: " + y + "\nz_gyr: " + z);
+            textView.setText("Sensor Type: " + sensor + "\nx_gyr: " + x + "\ny_gyr: " + y + "\nz_gyr: " + z);
         }
         else if(sensor == Sensor.TYPE_MAGNETIC_FIELD) {
-            textView.setText("x_mag: " + x + "\ny_mag: " + y + "\nz_mag: " + z);
+            textView.setText("Sensor Type: " + sensor + "\nx_mag: " + x + "\ny_mag: " + y + "\nz_mag: " + z);
         }
         else{
             textView.setText("No sensor inputs detected.");
@@ -80,7 +86,12 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onResume() {
         super.onResume();
-        sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+//        sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        List<Sensor> sensorsList = sensorManager.getSensorList(Sensor.TYPE_ALL);
+        for(int i = 0; i < sensorsList.size(); i++) {
+//            System.out.println("SENSOR : " + i);
+            sensorManager.registerListener(sensorEventListener, sensorsList.get(i), SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
 
     protected void onPause() {
